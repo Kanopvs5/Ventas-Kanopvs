@@ -1,0 +1,426 @@
+[
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Bota Jordan Niño Plata X Negro X Rojo",
+    "categoria": "O",
+    "tallas": {
+      "28": 1,
+      "31": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK stitch Morado X Azul X Gris",
+    "categoria": "O",
+    "tallas": {
+      "21": 1,
+      "25": 1,
+      "27": 1,
+      "28": 1,
+      "31": 1,
+      "32": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK Spiderman Morado X Negro X Gris",
+    "categoria": "O",
+    "tallas": {
+      "21": 1,
+      "26": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK Capibara Felpa Café",
+    "categoria": "O",
+    "tallas": {
+      "21": 1,
+      "22": 1,
+      "27": 1,
+      "30": 2
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "PUMA Spiderman Blanco X Negro X rojo",
+    "categoria": "O",
+    "tallas": {
+      "22": 1,
+      "26": 1,
+      "31": 1,
+      "32": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "PUMA invertido Spiderman Blanco X Rojo X Negro",
+    "categoria": "O",
+    "tallas": {
+      "21": 1,
+      "24": 1,
+      "26": 2
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "PUMA Mickey Blanco X Negro X rojo",
+    "categoria": "O",
+    "tallas": {
+      "21": 1,
+      "24": 1,
+      "25": 1,
+      "26": 2
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "PUMA Tom y Jerry Blanco X Miel",
+    "categoria": "O",
+    "tallas": {
+      "27": 1,
+      "29": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Plataforma Stitch",
+    "categoria": "O",
+    "tallas": {
+      "21": 1,
+      "22": 1,
+      "24": 1,
+      "25": 1,
+      "26": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK osito Beige X Azul X Rojo ",
+    "categoria": "O",
+    "tallas": {
+      "27": 1,
+      "29": 1,
+      "31": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK osito Beige X Café X Naranja ",
+    "categoria": "O",
+    "tallas": {
+      "28": 1,
+      "31": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK osito Gris X Negro X Rojo",
+    "categoria": "O",
+    "tallas": {
+      "22": 1,
+      "28": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Plataforma Blanco X Negro Mariposa",
+    "categoria": "O",
+    "tallas": {
+      "27": 1,
+      "28": 3,
+      "29": 1,
+      "30": 2
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "DC GBA",
+    "categoria": "O",
+    "tallas": {
+      "28": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK Imperial Blanco X Negro",
+    "categoria": "O",
+    "tallas": {
+      "22": 1,
+      "23": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK Imperial Blanco X Plata X Rojo",
+    "categoria": "O",
+    "tallas": {
+      "26": 1,
+      "30": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK Imperial Beis X Plateado X Rojo",
+    "categoria": "O",
+    "tallas": {
+      "25": 1,
+      "26": 1,
+      "27": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Plataforma Tralalero",
+    "categoria": "O",
+    "tallas": {
+      "22": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Plataforma spiderman Blanco X Azul X Café",
+    "categoria": "O",
+    "tallas": {
+      "26": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK Balleli Beige X Negro",
+    "categoria": "O",
+    "tallas": {
+      "27": 3,
+      "29": 3
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "DC Negro capibara",
+    "categoria": "U",
+    "tallas": {
+      "24": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK Imperial Beis X Blanco ",
+    "categoria": "U",
+    "tallas": {}
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK F1 COLEGIAL",
+    "categoria": "U",
+    "tallas": {
+      "21": 1,
+      "22": 2,
+      "23": 2,
+      "24": 3,
+      "25": 3,
+      "26": 3,
+      "27": 3,
+      "28": 4,
+      "29": 4,
+      "30": 3,
+      "31": 2,
+      "32": 2
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Plataforma Plana Capibara Beige X Crema",
+    "categoria": "U",
+    "tallas": {
+      "21": 2,
+      "22": 2,
+      "28": 3,
+      "31": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Plataforma Plana Capibara Beige X Crema X Café",
+    "categoria": "U",
+    "tallas": {
+      "26": 1,
+      "31": 1,
+      "33": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Capibara Spinner Beis X Crema",
+    "categoria": "U",
+    "tallas": {
+      "26": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Plataforma Blanco X Lila",
+    "categoria": "A",
+    "tallas": {
+      "27": 1,
+      "28": 1,
+      "29": 1,
+      "30": 1,
+      "31": 2
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "DC Rosado X Blanco X Celeste",
+    "categoria": "A",
+    "tallas": {
+      "22": 1,
+      "26": 1,
+      "27": 1,
+      "28": 1,
+      "30": 1,
+      "32": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK Balleli Beige X Negro",
+    "categoria": "A",
+    "tallas": {
+      "21": 3,
+      "22": 1,
+      "24": 2,
+      "25": 3,
+      "26": 3
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK Palo Rosa B X N ",
+    "categoria": "A",
+    "tallas": {
+      "28": 1,
+      "29": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "DC Spiderman Negro (PAPA)",
+    "categoria": "O",
+    "tallas": {}
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Plataforma Spiderman Rojo X Beis X Negro",
+    "categoria": "O",
+    "tallas": {
+      "22": 1,
+      "29": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Plataforma Kuromi Morado X Blanco",
+    "categoria": "A",
+    "tallas": {
+      "25": 2
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "PUMA Negro X Fucsia",
+    "categoria": "A",
+    "tallas": {
+      "26": 1,
+      "27": 1,
+      "28": 1,
+      "29": 1,
+      "30": 1,
+      "31": 1,
+      "32": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "NK Capibara Blanco X Palo Rosa",
+    "categoria": "A",
+    "tallas": {
+      "27": 2,
+      "31": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Luces Minnie Crema X Rosado ",
+    "categoria": "A",
+    "tallas": {
+      "21": 1,
+      "25": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "PUMA Capibara Blanco X Rosado",
+    "categoria": "A",
+    "tallas": {
+      "32": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "PUMA Hello Kitty Blanco X Rosado",
+    "categoria": "A",
+    "tallas": {
+      "28": 1,
+      "31": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Hello Kitty Luces Crema X Negro X Rosado",
+    "categoria": "A",
+    "tallas": {
+      "29": 1,
+      "31": 1,
+      "32": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "Stitch Crema X Celeste X Rosado (PAPA)",
+    "categoria": "A",
+    "tallas": {
+      "25": 1,
+      "26": 1
+    }
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "",
+    "categoria": "",
+    "tallas": {}
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "",
+    "categoria": "",
+    "tallas": {}
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "",
+    "categoria": "",
+    "tallas": {}
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "",
+    "categoria": "",
+    "tallas": {}
+  },
+  {
+    "codigo": "DEP-01",
+    "descripcion": "",
+    "categoria": "",
+    "tallas": {}
+  }
+]

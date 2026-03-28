@@ -1,0 +1,236 @@
+[
+  {
+    "id": "Producto 001",
+    "nombre": "Producto 001",
+    "categoria": "Calzado infantil",
+    "codigo": "DEP-01",
+    "marca": "Deportivo_Bog",
+    "precio": 60000.0,
+    "ganancia": 10000.0
+  },
+  {
+    "id": "Producto 002",
+    "nombre": "Producto 002",
+    "categoria": "Calzado infantil",
+    "codigo": "DEP-02",
+    "marca": "Deportivo_Ipi",
+    "precio": 70000.0,
+    "ganancia": 10000.0
+  },
+  {
+    "id": "Producto 003",
+    "nombre": "Producto 003",
+    "categoria": "Calzado infantil",
+    "codigo": "DEP-03",
+    "marca": "NIKE F1",
+    "precio": 55000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 004",
+    "nombre": "Producto 004",
+    "categoria": "Calzado infantil",
+    "codigo": "DEP-04",
+    "marca": "Bebés_ipiales",
+    "precio": 35000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 005",
+    "nombre": "Producto 005",
+    "categoria": "Calzado infantil",
+    "codigo": "PIL-05",
+    "marca": "Pilin",
+    "precio": 55000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 006",
+    "nombre": "Producto 006",
+    "categoria": "Pantufla",
+    "codigo": "PAN-06",
+    "marca": "Hongrui_Adulto 31-45",
+    "precio": 40000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 007",
+    "nombre": "Producto 007",
+    "categoria": "Pantufla",
+    "codigo": "PAN-07",
+    "marca": "Hongrui_Infantil 24-30",
+    "precio": 38000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 008",
+    "nombre": "Producto 008",
+    "categoria": "Sandalia",
+    "codigo": "SAN-08",
+    "marca": "Roxana_CE",
+    "precio": 60000.0,
+    "ganancia": 5000.0
+  },
+  {
+    "id": "Producto 009",
+    "nombre": "Producto 009",
+    "categoria": "Sandalia",
+    "codigo": "SAN-09",
+    "marca": "Princesa_CE",
+    "precio": 60000.0,
+    "ganancia": 5000.0
+  },
+  {
+    "id": "Producto 010",
+    "nombre": "Producto 010",
+    "categoria": "Sandalia",
+    "codigo": "SAN-10",
+    "marca": "Semiplana_CE",
+    "precio": 45000.0,
+    "ganancia": 5000.0
+  },
+  {
+    "id": "Producto 011",
+    "nombre": "Producto 011",
+    "categoria": "Sandalia",
+    "codigo": "SAN-11",
+    "marca": "Plana_CE",
+    "precio": 40000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 012",
+    "nombre": "Producto 012",
+    "categoria": "Sandalia",
+    "codigo": "SAN-12",
+    "marca": "Plataforma_CE",
+    "precio": 45000.0,
+    "ganancia": 5.0
+  },
+  {
+    "id": "Producto 013",
+    "nombre": "Producto 013",
+    "categoria": "Baleta",
+    "codigo": "BAL-13",
+    "marca": "Baja_CE",
+    "precio": 30000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 014",
+    "nombre": "Producto 014",
+    "categoria": "Baleta",
+    "codigo": "BAL-14",
+    "marca": "Playera_CE",
+    "precio": 35000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 015",
+    "nombre": "Producto 015",
+    "categoria": "Bota",
+    "codigo": "BOT-15",
+    "marca": "Bota plástica",
+    "precio": 45000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 016",
+    "nombre": "Producto 016",
+    "categoria": "Bota",
+    "codigo": "BOT-16",
+    "marca": "Macha/Titan",
+    "precio": 50000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 017",
+    "nombre": "Producto 017",
+    "categoria": "Chancla",
+    "codigo": "CHA-17",
+    "marca": "Chancla",
+    "precio": 28000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 018",
+    "nombre": "Producto 018",
+    "categoria": "Acuaticos",
+    "codigo": "ACU-18",
+    "marca": "Fenix Cali",
+    "precio": 30000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 019",
+    "nombre": "Producto 019",
+    "categoria": "Converse",
+    "codigo": "CON-19",
+    "marca": "Sohue",
+    "precio": 35000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 020",
+    "nombre": "Producto 020",
+    "categoria": "Suecos",
+    "codigo": "CHA-20",
+    "marca": "Pequeña",
+    "precio": 20000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 021",
+    "nombre": "Producto 021",
+    "categoria": "Chancla Fina",
+    "codigo": "CHA-21",
+    "marca": "Fina",
+    "precio": 45000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 022",
+    "nombre": "Producto 022",
+    "categoria": "Suecos finos",
+    "codigo": "CHA-22",
+    "marca": "Fina",
+    "precio": 25000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 023",
+    "nombre": "Producto 023",
+    "categoria": "Chancla Fina",
+    "codigo": "CHA-23",
+    "marca": "Carlos Vives",
+    "precio": 35000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 024",
+    "nombre": "Producto 024",
+    "categoria": "Bota",
+    "codigo": "BOP-24",
+    "marca": "Bota pequeña",
+    "precio": 35000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 025",
+    "nombre": "Producto 025",
+    "categoria": "Ruana",
+    "codigo": "RUA-25",
+    "marca": "Ruana Bogotá",
+    "precio": 70000.0,
+    "ganancia": 0
+  },
+  {
+    "id": "Producto 026",
+    "nombre": "Producto 026",
+    "categoria": "Bota",
+    "codigo": "BOP-26",
+    "marca": "Bota pequeña",
+    "precio": 30000.0,
+    "ganancia": 0
+  }
+]
