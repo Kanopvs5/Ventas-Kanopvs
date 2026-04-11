@@ -569,6 +569,11 @@ function iniciarApp(){
   document.getElementById('inp-fecha').value=hoy();
   buildTallasInputs();
   Promise.all([cargarProductos(),cargarVentas(),cargarInventario()]);
+  setInterval(() => {
+    cargarVentas();
+    cargarProductos();
+    cargarInventario();
+  }, 20000);
 }
 </script>
 </body>
