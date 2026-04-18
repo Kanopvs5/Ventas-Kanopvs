@@ -1,30 +1,80 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, session, redirect
 import os, io
 from datetime import datetime
 from supabase import create_client
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "kiddoshoes2026secretkey")
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://bbzmwneywbbgamnttply.supabase.co")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "sb_secret_SZ5faQY12P2YhtmXL8z9_g_KzSthjcd")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "sb_publishable_kDvKdK8S-AZxiGRnBRqpHw_Tjky7Uhe")
+ADMIN_EMAIL  = os.environ.get("ADMIN_EMAIL", "")
 
 sb = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# ── Auth helpers ──────────────────────────────────────────────────────────────
+
+def get_user():
+    token = session.get("access_token")
+    if not token:
+        return None
+    try:
+        r = sb.auth.get_user(token)
+        return r.user
+    except:
+        return None
+
+def is_admin(user):
+    if not user or not ADMIN_EMAIL:
+        return False
+    return user.email == ADMIN_EMAIL
 
 # ── Rutas ─────────────────────────────────────────────────────────────────────
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    user = get_user()
+    if not user:
+        return redirect("/login")
+    return render_template("index.html", user_email=user.email, is_admin=is_admin(user))
+
+@app.route("/login")
+def login_page():
+    return render_template("login.html")
+
+@app.route("/api/auth/login", methods=["POST"])
+def api_login():
+    data  = request.get_json()
+    email = data.get("email","").strip()
+    pwd   = data.get("password","").strip()
+    try:
+        r = sb.auth.sign_in_with_password({"email": email, "password": pwd})
+        session["access_token"]  = r.session.access_token
+        session["refresh_token"] = r.session.refresh_token
+        session["user_email"]    = r.user.email
+        session["user_id"]       = str(r.user.id)
+        return jsonify({"ok": True, "email": r.user.email})
+    except Exception as e:
+        return jsonify({"error": "Correo o contraseña incorrectos"}), 401
+
+@app.route("/api/auth/logout", methods=["POST"])
+def api_logout():
+    session.clear()
+    return jsonify({"ok": True})
 
 # ── API Productos ─────────────────────────────────────────────────────────────
 
 @app.route("/api/productos", methods=["GET"])
 def api_get_productos():
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
     r = sb.table("productos").select("*").execute()
     return jsonify(r.data)
 
 @app.route("/api/productos", methods=["POST"])
 def api_crear_producto():
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
     data = request.get_json()
     producto = {
         "id":        data["nombre"].strip(),
@@ -40,6 +90,8 @@ def api_crear_producto():
 
 @app.route("/api/productos/<path:pid>", methods=["PUT"])
 def api_editar_producto(pid):
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
     data = request.get_json()
     update = {
         "categoria": data.get("categoria","").strip(),
@@ -53,6 +105,8 @@ def api_editar_producto(pid):
 
 @app.route("/api/productos/<path:pid>", methods=["DELETE"])
 def api_eliminar_producto(pid):
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
     sb.table("productos").delete().eq("id", pid).execute()
     return jsonify({"ok": True})
 
@@ -60,11 +114,15 @@ def api_eliminar_producto(pid):
 
 @app.route("/api/inventario", methods=["GET"])
 def api_get_inventario():
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
     r = sb.table("inventario").select("*").execute()
     return jsonify(r.data)
 
 @app.route("/api/inventario", methods=["POST"])
 def api_crear_item():
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
     data = request.get_json()
     item = {
         "codigo":      data.get("codigo","").strip(),
@@ -77,6 +135,8 @@ def api_crear_item():
 
 @app.route("/api/inventario/<int:iid>", methods=["PUT"])
 def api_editar_item(iid):
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
     data = request.get_json()
     update = {
         "codigo":      data.get("codigo","").strip(),
@@ -89,6 +149,8 @@ def api_editar_item(iid):
 
 @app.route("/api/inventario/<int:iid>", methods=["DELETE"])
 def api_eliminar_item(iid):
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
     sb.table("inventario").delete().eq("id", iid).execute()
     return jsonify({"ok": True})
 
@@ -96,21 +158,26 @@ def api_eliminar_item(iid):
 
 @app.route("/api/ventas", methods=["GET"])
 def api_get_ventas():
-    r = sb.table("ventas").select("*").order("id", desc=True).execute()
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
+    if is_admin(user):
+        r = sb.table("ventas").select("*").order("id", desc=True).execute()
+    else:
+        r = sb.table("ventas").select("*").eq("user_email", user.email).order("id", desc=True).execute()
     return jsonify(r.data)
 
 @app.route("/api/ventas", methods=["POST"])
 def api_registrar_venta():
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
     data     = request.get_json()
     pid      = data["producto_id"]
     cant     = int(data["cantidad"])
     fecha    = data.get("fecha") or datetime.now().strftime("%Y-%m-%d")
-
     pr = sb.table("productos").select("*").eq("id", pid).execute()
     if not pr.data:
         return jsonify({"error": "Producto no encontrado"}), 404
     producto = pr.data[0]
-
     venta = {
         "producto_id":     pid,
         "nombre":          producto["nombre"],
@@ -124,12 +191,16 @@ def api_registrar_venta():
         "ganancia_total":  producto["ganancia"] * cant,
         "fecha":           fecha,
         "hora":            datetime.now().strftime("%H:%M"),
+        "user_id":         session.get("user_id"),
+        "user_email":      user.email,
     }
     r = sb.table("ventas").insert(venta).execute()
     return jsonify(r.data[0] if r.data else venta), 201
 
 @app.route("/api/ventas/<int:vid>", methods=["DELETE"])
 def api_eliminar_venta(vid):
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
     sb.table("ventas").delete().eq("id", vid).execute()
     return jsonify({"ok": True})
 
@@ -137,15 +208,21 @@ def api_eliminar_venta(vid):
 
 @app.route("/api/exportar/excel")
 def exportar_excel():
+    user = get_user()
+    if not user: return redirect("/login")
     try:
         from openpyxl import Workbook
         from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     except ImportError:
         return jsonify({"error":"pip install openpyxl"}), 500
 
-    ventas    = sb.table("ventas").select("*").order("id", desc=False).execute().data
+    if is_admin(user):
+        ventas = sb.table("ventas").select("*").order("id", desc=False).execute().data
+    else:
+        ventas = sb.table("ventas").select("*").eq("user_email", user.email).order("id", desc=False).execute().data
+
     productos = sb.table("productos").select("*").execute().data
-    wb        = Workbook()
+    wb = Workbook()
 
     hf   = PatternFill("solid", start_color="1a1a18")
     hfnt = Font(bold=True, color="FFFFFF", name="Arial", size=10)
@@ -169,34 +246,19 @@ def exportar_excel():
 
     ws = wb.active
     ws.title = "VENTAS"
-    set_header(ws, ["Fecha","Categoría","Código","Producto","Marca","Precio","Cantidad","Total","Ganancia"],
-                   [14,18,12,18,20,14,10,14,14])
+    set_header(ws, ["Fecha","Categoría","Código","Producto","Marca","Precio","Cantidad","Total","Ganancia","Vendedor"],
+                   [14,18,12,18,20,14,10,14,14,20])
     total_v = gan_v = 0
     for i, v in enumerate(ventas):
         r = i + 3
         fill = alt if i % 2 == 0 else PatternFill("solid", start_color="FFFFFF")
         for col, val in enumerate([v["fecha"],v.get("categoria",""),v.get("codigo",""),v["nombre"],
-                v.get("marca",""),v["precio_unitario"],v["cantidad"],v["total"],v.get("ganancia_total",0)], 1):
+                v.get("marca",""),v["precio_unitario"],v["cantidad"],v["total"],
+                v.get("ganancia_total",0),v.get("user_email","")], 1):
             c = ws.cell(row=r, column=col, value=val)
             c.font = nfnt; c.fill = fill; c.border = brd; c.alignment = ctr
         total_v += v["total"]; gan_v += v.get("ganancia_total",0)
         ws.row_dimensions[r].height = 16
-    tr = len(ventas) + 3
-    for col, val in enumerate(["","","","","","TOTAL","",total_v,gan_v], 1):
-        c = ws.cell(row=tr, column=col, value=val)
-        c.font = Font(bold=True, name="Arial", size=10)
-        c.fill = PatternFill("solid", start_color="EAF3DE"); c.border = brd; c.alignment = ctr
-
-    ws2 = wb.create_sheet("PRODUCTOS")
-    set_header(ws2, ["Nombre","Categoría","Código","Marca","Precio","Ganancia/par"],
-                    [18,18,12,22,14,14])
-    for i, p in enumerate(productos):
-        r = i + 3
-        fill = alt if i % 2 == 0 else PatternFill("solid", start_color="FFFFFF")
-        for col, val in enumerate([p["nombre"],p["categoria"],p["codigo"],p["marca"],p["precio"],p["ganancia"]], 1):
-            c = ws2.cell(row=r, column=col, value=val)
-            c.font = nfnt; c.fill = fill; c.border = brd; c.alignment = ctr
-        ws2.row_dimensions[r].height = 16
 
     buf = io.BytesIO()
     wb.save(buf); buf.seek(0)
@@ -204,30 +266,32 @@ def exportar_excel():
     return send_file(buf, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                      as_attachment=True, download_name=fname)
 
-# ── Exportar PDF ──────────────────────────────────────────────────────────────
-
 @app.route("/api/exportar/pdf")
 def exportar_pdf():
+    user = get_user()
+    if not user: return redirect("/login")
     try:
         from reportlab.lib.pagesizes import A4, landscape
         from reportlab.lib import colors
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
         from reportlab.lib.units import cm
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
     except ImportError:
         return jsonify({"error":"pip install reportlab"}), 500
 
-    ventas = sb.table("ventas").select("*").order("id", desc=False).execute().data
-    buf    = io.BytesIO()
-    doc    = SimpleDocTemplate(buf, pagesize=landscape(A4),
-                               topMargin=1.5*cm, bottomMargin=1.5*cm,
-                               leftMargin=1.5*cm, rightMargin=1.5*cm)
+    if is_admin(user):
+        ventas = sb.table("ventas").select("*").order("id", desc=False).execute().data
+    else:
+        ventas = sb.table("ventas").select("*").eq("user_email", user.email).order("id", desc=False).execute().data
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=landscape(A4),
+                            topMargin=1.5*cm, bottomMargin=1.5*cm,
+                            leftMargin=1.5*cm, rightMargin=1.5*cm)
     styles  = getSampleStyleSheet()
-    t_style = ParagraphStyle("t", parent=styles["Heading1"], fontSize=14, spaceAfter=4,
-                              textColor=colors.HexColor("#1a1a18"))
-    s_style = ParagraphStyle("s", parent=styles["Normal"], fontSize=8,
-                              textColor=colors.HexColor("#6b6b67"), spaceAfter=12)
-    elems   = [Paragraph("Reporte de Ventas — KANOPVS", t_style),
+    t_style = ParagraphStyle("t", parent=styles["Heading1"], fontSize=14, spaceAfter=4)
+    s_style = ParagraphStyle("s", parent=styles["Normal"], fontSize=8, spaceAfter=12)
+    elems   = [Paragraph("Reporte de Ventas — KiddoShoes", t_style),
                Paragraph(f"Generado el {datetime.now().strftime('%d/%m/%Y %H:%M')}", s_style)]
 
     hdr  = ["Fecha","Categoría","Código","Producto","Marca","Precio","Cant.","Total","Ganancia"]
@@ -254,7 +318,6 @@ def exportar_pdf():
         ("GRID",(0,0),(-1,-1),0.4,colors.HexColor("#E2E0D8")),
         ("ROWHEIGHT",(0,0),(-1,-1),0.55*cm),
         ("BACKGROUND",(0,-1),(-1,-1),colors.HexColor("#EAF3DE")),
-        ("FONTNAME",(7,-1),(8,-1),"Helvetica-Bold"),
     ]))
     elems.append(t)
     doc.build(elems)
