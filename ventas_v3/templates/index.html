@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
-<title>KIDDOSHOES — Ventas</title>
+<title>KiddoShoesRegister</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -19,25 +19,26 @@
 }
 body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.5; }
 
-/* ── PIN SCREEN ── */
+/* PIN */
 #pin-screen { position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:1000; }
 .pin-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:2.5rem 2rem; width:320px; text-align:center; }
-.pin-box h2 { font-size:24px; font-weight:700; margin-bottom:4px; letter-spacing:.04em; }
+.pin-box h2 { font-family:'Anton',sans-serif; font-size:24px; margin-bottom:4px; letter-spacing:.04em; }
 .pin-box p  { font-size:13px; color:var(--muted); margin-bottom:1.5rem; }
 .pin-dots { display:flex; justify-content:center; gap:12px; margin-bottom:1.5rem; }
 .pin-dot  { width:14px; height:14px; border-radius:50%; border:2px solid var(--border2); background:transparent; transition:background .15s; }
 .pin-dot.filled { background:var(--text); border-color:var(--text); }
 .pin-pad  { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-.pin-key  { padding:14px; border-radius:var(--r-sm); border:1px solid var(--border); background:var(--bg); font-size:18px; font-weight:600; cursor:pointer; transition:background .1s; }
+.pin-key  { padding:14px; border-radius:var(--r-sm); border:1px solid var(--border); background:var(--bg); font-size:18px; font-weight:600; cursor:pointer; }
 .pin-key:hover  { background:var(--border); }
 .pin-key:active { transform:scale(.95); }
 .pin-error { color:var(--danger); font-size:12px; margin-top:10px; min-height:18px; }
 
-/* ── APP ── */
+/* APP */
 #app { display:none; }
 header { background:var(--surface); border-bottom:1px solid var(--border); padding:0 1.5rem; display:flex; align-items:center; gap:1rem; height:54px; position:sticky; top:0; z-index:10; }
-header h1 { font-size:15px; font-weight:600; white-space:nowrap; }
-.tabs { display:flex; margin-left:auto; }
+header h1 { font-family:'Anton',sans-serif; font-size:20px; letter-spacing:.05em; white-space:nowrap; }
+.user-info { margin-left:auto; display:flex; align-items:center; gap:10px; font-size:12px; color:var(--muted); }
+.tabs { display:flex; }
 .tab { padding:0 16px; font-size:13px; font-weight:500; border:none; background:none; cursor:pointer; color:var(--muted); border-bottom:2px solid transparent; height:54px; }
 .tab.active { color:var(--text); border-bottom-color:var(--text); }
 .container { max-width:1200px; margin:0 auto; padding:1.25rem 1rem; }
@@ -79,22 +80,17 @@ tr:hover td { background:var(--bg); }
 .badge-ok   { background:var(--ok-bg);     color:var(--ok); }
 .badge-warn { background:var(--warn-bg);   color:var(--warn); }
 .badge-out  { background:var(--danger-bg); color:var(--danger); }
-
-/* Historial cajón */
 .hist-toggle { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.25rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--r); margin-bottom:1rem; cursor:pointer; user-select:none; }
 .hist-toggle:hover { background:var(--bg); }
 .hist-toggle span { font-size:13px; font-weight:500; }
 .hist-body { display:none; }
 .hist-body.open { display:block; }
-
-/* Modal contraseña */
 .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:none; align-items:center; justify-content:center; z-index:600; }
 .modal-bg.show { display:flex; }
 .modal-box { background:var(--surface); border-radius:var(--r); padding:1.5rem; width:300px; }
 .modal-box h3 { font-size:15px; font-weight:600; margin-bottom:1rem; }
 .modal-box input { margin-bottom:8px; }
 .modal-err { color:var(--danger); font-size:12px; margin-bottom:8px; min-height:16px; }
-
 .filter-row { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
 .filter-row input { flex:1; min-width:130px; max-width:220px; }
 .tallas-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); gap:8px; margin-top:8px; }
@@ -104,6 +100,7 @@ tr:hover td { background:var(--bg); }
 .toast { position:fixed; bottom:1.5rem; right:1.5rem; background:var(--text); color:#fff; padding:9px 16px; border-radius:var(--r); font-size:13px; opacity:0; transform:translateY(8px); transition:all .2s; pointer-events:none; z-index:999; }
 .toast.show { opacity:1; transform:translateY(0); }
 .toast.err  { background:var(--danger); }
+.admin-badge { background:var(--ok-bg); color:var(--ok); padding:2px 8px; border-radius:100px; font-size:11px; font-weight:600; }
 </style>
 </head>
 <body>
@@ -111,7 +108,7 @@ tr:hover td { background:var(--bg); }
 <!-- PIN -->
 <div id="pin-screen">
   <div class="pin-box">
-    <h2>KANOPVS</h2>
+    <h2>KiddoShoesRegister</h2>
     <p>Ingresa tu PIN para continuar</p>
     <div class="pin-dots">
       <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
@@ -152,12 +149,17 @@ tr:hover td { background:var(--bg); }
 <!-- APP -->
 <div id="app">
 <header>
-  <h1 style="font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.05em">KiddoShoesRegister</h1>
+  <h1>KiddoShoesRegister</h1>
   <nav class="tabs">
     <button class="tab active" onclick="switchTab('ventas')">Ventas</button>
     <button class="tab" onclick="switchTab('productos')">Productos</button>
     <button class="tab" onclick="switchTab('inventario')">Inventario</button>
   </nav>
+  <div class="user-info">
+    <span id="user-email-label"></span>
+    <span id="admin-badge" class="admin-badge" style="display:none">Admin</span>
+    <button class="btn btn-sm btn-danger" onclick="cerrarSesion()">Salir</button>
+  </div>
 </header>
 
 <div class="container">
@@ -192,7 +194,6 @@ tr:hover td { background:var(--bg); }
     </div>
   </div>
 
-  <!-- Ventas de hoy -->
   <div class="card">
     <div class="card-head">
       <div class="card-title">Ventas de hoy</div>
@@ -203,14 +204,13 @@ tr:hover td { background:var(--bg); }
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>#</th><th>Producto</th><th>Marca</th><th>Categoría</th><th>Cant.</th><th>Precio</th><th>Total</th><th>Ganancia</th><th>Hora</th><th></th></tr></thead>
+        <thead><tr><th>#</th><th>Producto</th><th>Marca</th><th>Categoría</th><th>Cant.</th><th>Precio</th><th>Total</th><th>Ganancia</th><th>Hora</th><th id="th-vendedor" style="display:none">Vendedor</th><th></th></tr></thead>
         <tbody id="tbody-hoy"></tbody>
       </table>
     </div>
     <div id="empty-hoy" style="display:none;padding:1.5rem;text-align:center;color:var(--hint);font-size:13px">No hay ventas registradas hoy.</div>
   </div>
 
-  <!-- Historial protegido -->
   <div class="hist-toggle" onclick="abrirHistorial()">
     <span>📁 Historial de ventas anteriores</span>
     <span id="hist-label" style="color:var(--muted);font-size:12px">🔒 Requiere contraseña</span>
@@ -227,7 +227,7 @@ tr:hover td { background:var(--bg); }
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>#</th><th>Fecha</th><th>Producto</th><th>Marca</th><th>Categoría</th><th>Cant.</th><th>Precio</th><th>Total</th><th>Ganancia</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Fecha</th><th>Producto</th><th>Marca</th><th>Categoría</th><th>Cant.</th><th>Precio</th><th>Total</th><th>Ganancia</th><th id="th-vendedor-hist" style="display:none">Vendedor</th><th></th></tr></thead>
           <tbody id="tbody-historial"></tbody>
         </table>
       </div>
@@ -295,6 +295,9 @@ tr:hover td { background:var(--bg); }
 <script>
 const PIN_ACCESO     = '556600';
 const PASS_HISTORIAL = '219237';
+const IS_ADMIN       = {{ 'true' if is_admin else 'false' }};
+const USER_EMAIL     = "{{ user_email }}";
+
 const fmt = n => '$' + Number(n).toLocaleString('es-CO');
 const hoy = () => new Date().toISOString().slice(0,10);
 let productos=[], ventas=[], inventario=[];
@@ -313,7 +316,7 @@ function pinKey(n){
         document.getElementById('app').style.display='block';
         iniciarApp();
       } else {
-        document.getElementById('pin-error').textContent='PIN incorrecto. Intenta de nuevo.';
+        document.getElementById('pin-error').textContent='PIN incorrecto.';
         pinActual=''; actualizarDots();
         setTimeout(()=>document.getElementById('pin-error').textContent='',2000);
       }
@@ -323,6 +326,12 @@ function pinKey(n){
 function pinClear(){ pinActual=pinActual.slice(0,-1); actualizarDots(); }
 function actualizarDots(){
   for(let i=0;i<6;i++) document.getElementById('d'+i).classList.toggle('filled',i<pinActual.length);
+}
+
+// ── SESIÓN ────────────────────────────────────────────────────────────────
+async function cerrarSesion(){
+  await fetch('/api/auth/logout',{method:'POST'});
+  window.location.href='/login';
 }
 
 // ── HISTORIAL ─────────────────────────────────────────────────────────────
@@ -464,13 +473,13 @@ async function eliminarVenta(id){
   await fetch(`/api/ventas/${id}`,{method:'DELETE'});
   await cargarVentas(); if(histDesbloqueado) renderHistorial(); toast('Eliminada.');
 }
-
-// Solo hoy, más reciente arriba
 function renderVentasHoy(){
   const h=hoy(), list=ventas.filter(v=>v.fecha===h);
   const tb=document.getElementById('tbody-hoy'), empty=document.getElementById('empty-hoy');
   if(!list.length){tb.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
+  const showVendedor = IS_ADMIN;
+  if(showVendedor) document.getElementById('th-vendedor').style.display='';
   tb.innerHTML=list.map(v=>`
     <tr>
       <td style="color:var(--muted)">#${v.id}</td><td><strong>${v.nombre}</strong></td>
@@ -478,11 +487,10 @@ function renderVentasHoy(){
       <td>${v.cantidad}</td><td>${fmt(v.precio_unitario)}</td>
       <td><strong>${fmt(v.total)}</strong></td><td style="color:var(--ok)">${fmt(v.ganancia_total||0)}</td>
       <td style="color:var(--muted)">${v.hora}</td>
+      ${showVendedor?`<td style="color:var(--muted);font-size:11px">${v.user_email||''}</td>`:''}
       <td><button class="btn btn-sm btn-danger" onclick="eliminarVenta(${v.id})">✕</button></td>
     </tr>`).join('');
 }
-
-// Historial: días anteriores, más antigua arriba (reverse)
 function renderHistorial(){
   const h=hoy();
   const qf=document.getElementById('filtro-fecha').value;
@@ -490,17 +498,19 @@ function renderHistorial(){
   let list=ventas.filter(v=>v.fecha!==h);
   if(qf) list=list.filter(v=>v.fecha===qf);
   if(qp) list=list.filter(v=>v.nombre.toLowerCase().includes(qp));
-  list=[...list].reverse(); // más antigua arriba
+  list=[...list].reverse();
+  const showVendedor = IS_ADMIN;
+  if(showVendedor) document.getElementById('th-vendedor-hist').style.display='';
   document.getElementById('tbody-historial').innerHTML=list.map(v=>`
     <tr>
       <td style="color:var(--muted)">#${v.id}</td><td>${v.fecha}</td><td><strong>${v.nombre}</strong></td>
       <td style="color:var(--muted)">${v.marca||''}</td><td style="color:var(--muted)">${v.categoria||''}</td>
       <td>${v.cantidad}</td><td>${fmt(v.precio_unitario)}</td>
       <td><strong>${fmt(v.total)}</strong></td><td style="color:var(--ok)">${fmt(v.ganancia_total||0)}</td>
+      ${showVendedor?`<td style="color:var(--muted);font-size:11px">${v.user_email||''}</td>`:''}
       <td><button class="btn btn-sm btn-danger" onclick="eliminarVenta(${v.id})">✕</button></td>
     </tr>`).join('');
 }
-
 function updateMetrics(){
   const h=hoy(), hoyV=ventas.filter(v=>v.fecha===h);
   document.getElementById('m-total').textContent=fmt(hoyV.reduce((s,v)=>s+v.total,0));
@@ -568,13 +578,11 @@ function renderInventario(){
 // ── Init ──────────────────────────────────────────────────────────────────
 function iniciarApp(){
   document.getElementById('inp-fecha').value=hoy();
+  document.getElementById('user-email-label').textContent=USER_EMAIL;
+  if(IS_ADMIN) document.getElementById('admin-badge').style.display='';
   buildTallasInputs();
   Promise.all([cargarProductos(),cargarVentas(),cargarInventario()]);
-  setInterval(() => {
-    cargarVentas();
-    cargarProductos();
-    cargarInventario();
-  }, 20000);
+  setInterval(()=>{ cargarVentas(); }, 20000);
 }
 </script>
 </body>
