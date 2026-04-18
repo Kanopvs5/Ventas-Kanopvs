@@ -512,7 +512,7 @@ function renderHistorial(){
   let list=ventas.filter(v=>v.fecha!==h);
   if(qf) list=list.filter(v=>v.fecha===qf);
   if(qp) list=list.filter(v=>v.nombre.toLowerCase().includes(qp));
-  list=[...list].reverse();
+  if(ordenHistAscendente) list=[...list].reverse();
   const showVendedor = IS_ADMIN;
   if(showVendedor) document.getElementById('th-vendedor-hist').style.display='';
   document.getElementById('tbody-historial').innerHTML=list.map(v=>`
