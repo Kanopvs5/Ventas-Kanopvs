@@ -396,7 +396,7 @@ function renderProductos(){
 function refreshSelectProducto(){
   const sel=document.getElementById('sel-producto'), val=sel.value;
   sel.innerHTML='<option value="">— Seleccionar —</option>'+
-    productos.map(p=>`<option value="${p.id}">${p.nombre} — ${p.marca} — ${fmt(p.precio)}</option>`).join('');
+    productos.map(p=>`<option value="${p.categoria}">${p.nombre} — ${p.marca} — ${fmt(p.precio)}</option>`).join('');
   if(val) sel.value=val; updatePreview();
 }
 async function guardarProducto(){
