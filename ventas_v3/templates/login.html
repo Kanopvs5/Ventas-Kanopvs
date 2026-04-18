@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KiddoShoesRegister — Iniciar sesión</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#f5f4f0; --surface:#fff; --border:#e2e0d8;
+  --text:#1a1a18; --muted:#6b6b67;
+  --danger:#a32d2d; --danger-bg:#fcebeb;
+  --r:10px; --r-sm:6px;
+}
+body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); font-size:14px; min-height:100vh; display:flex; align-items:center; justify-content:center; }
+.login-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:2.5rem 2rem; width:340px; }
+.login-box h1 { font-family:'Anton',sans-serif; font-size:26px; letter-spacing:.05em; margin-bottom:6px; }
+.login-box p { font-size:13px; color:var(--muted); margin-bottom:1.5rem; }
+.fg { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
+.fg label { font-size:12px; color:var(--muted); font-weight:500; }
+input { width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:var(--r-sm); font-size:13px; background:var(--bg); color:var(--text); outline:none; }
+input:focus { border-color:var(--text); background:var(--surface); }
+.btn { width:100%; padding:10px; border-radius:var(--r-sm); font-size:14px; font-weight:600; cursor:pointer; border:none; background:var(--text); color:#fff; margin-top:4px; }
+.btn:hover { opacity:.85; }
+.error { color:var(--danger); font-size:12px; background:var(--danger-bg); padding:8px 12px; border-radius:var(--r-sm); margin-bottom:10px; display:none; }
+</style>
+</head>
+<body>
+<div class="login-box">
+  <h1>KiddoShoesRegister</h1>
+  <p>Inicia sesión para continuar</p>
+  <div class="error" id="error"></div>
+  <div class="fg">
+    <label>Correo electrónico</label>
+    <input type="email" id="email" placeholder="correo@ejemplo.com" onkeydown="if(event.key==='Enter')login()">
+  </div>
+  <div class="fg">
+    <label>Contraseña</label>
+    <input type="password" id="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+  </div>
+  <button class="btn" onclick="login()">Iniciar sesión</button>
+</div>
+<script>
+async function login() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const err = document.getElementById('error');
+  err.style.display = 'none';
+  if (!email || !password) { err.textContent = 'Completa todos los campos.'; err.style.display = 'block'; return; }
+  const r = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({email, password})
+  });
+  const data = await r.json();
+  if (r.ok) {
+    window.location.href = '/';
+  } else {
+    err.textContent = data.error;
+    err.style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
