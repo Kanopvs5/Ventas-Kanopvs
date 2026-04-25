@@ -12,7 +12,7 @@ ADMIN_EMAIL  = os.environ.get("ADMIN_EMAIL", "")
 
 sb = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# ── Auth helpers ──────────────────────────────────────────────────────────────
+# ── Auth ──────────────────────────────────────────────────────────────────────
 
 def get_user():
     token = session.get("access_token")
@@ -44,17 +44,15 @@ def login_page():
 
 @app.route("/api/auth/login", methods=["POST"])
 def api_login():
-    data  = request.get_json()
-    email = data.get("email","").strip()
-    pwd   = data.get("password","").strip()
+    data = request.get_json()
     try:
-        r = sb.auth.sign_in_with_password({"email": email, "password": pwd})
+        r = sb.auth.sign_in_with_password({"email": data["email"].strip(), "password": data["password"]})
         session["access_token"]  = r.session.access_token
         session["refresh_token"] = r.session.refresh_token
         session["user_email"]    = r.user.email
         session["user_id"]       = str(r.user.id)
         return jsonify({"ok": True, "email": r.user.email})
-    except Exception as e:
+    except:
         return jsonify({"error": "Correo o contraseña incorrectos"}), 401
 
 @app.route("/api/auth/logout", methods=["POST"])
@@ -74,7 +72,7 @@ def api_get_productos():
 @app.route("/api/productos", methods=["POST"])
 def api_crear_producto():
     user = get_user()
-    if not user: return jsonify({"error": "No autenticado"}), 401
+    if not user or not is_admin(user): return jsonify({"error": "Sin permisos"}), 403
     data = request.get_json()
     producto = {
         "id":        data["nombre"].strip(),
@@ -84,6 +82,7 @@ def api_crear_producto():
         "marca":     data.get("marca","").strip(),
         "precio":    float(data.get("precio", 0)),
         "ganancia":  float(data.get("ganancia", 0)),
+        "color":     data.get("color", "#ffffff"),
     }
     r = sb.table("productos").insert(producto).execute()
     return jsonify(r.data[0] if r.data else producto), 201
@@ -91,7 +90,7 @@ def api_crear_producto():
 @app.route("/api/productos/<path:pid>", methods=["PUT"])
 def api_editar_producto(pid):
     user = get_user()
-    if not user: return jsonify({"error": "No autenticado"}), 401
+    if not user or not is_admin(user): return jsonify({"error": "Sin permisos"}), 403
     data = request.get_json()
     update = {
         "categoria": data.get("categoria","").strip(),
@@ -99,6 +98,7 @@ def api_editar_producto(pid):
         "marca":     data.get("marca","").strip(),
         "precio":    float(data.get("precio", 0)),
         "ganancia":  float(data.get("ganancia", 0)),
+        "color":     data.get("color", "#ffffff"),
     }
     r = sb.table("productos").update(update).eq("id", pid).execute()
     return jsonify(r.data[0] if r.data else update)
@@ -106,52 +106,59 @@ def api_editar_producto(pid):
 @app.route("/api/productos/<path:pid>", methods=["DELETE"])
 def api_eliminar_producto(pid):
     user = get_user()
-    if not user: return jsonify({"error": "No autenticado"}), 401
+    if not user or not is_admin(user): return jsonify({"error": "Sin permisos"}), 403
     sb.table("productos").delete().eq("id", pid).execute()
     return jsonify({"ok": True})
 
-# ── API Inventario ────────────────────────────────────────────────────────────
+# ── API Subproductos ──────────────────────────────────────────────────────────
 
-@app.route("/api/inventario", methods=["GET"])
-def api_get_inventario():
+@app.route("/api/subproductos", methods=["GET"])
+def api_get_subproductos():
     user = get_user()
     if not user: return jsonify({"error": "No autenticado"}), 401
-    r = sb.table("inventario").select("*").execute()
+    pid = request.args.get("producto_id")
+    q = sb.table("subproductos").select("*")
+    if pid:
+        q = q.eq("producto_id", pid)
+    r = q.execute()
     return jsonify(r.data)
 
-@app.route("/api/inventario", methods=["POST"])
-def api_crear_item():
+@app.route("/api/subproductos", methods=["POST"])
+def api_crear_subproducto():
     user = get_user()
-    if not user: return jsonify({"error": "No autenticado"}), 401
+    if not user or not is_admin(user): return jsonify({"error": "Sin permisos"}), 403
     data = request.get_json()
     item = {
-        "codigo":      data.get("codigo","").strip(),
-        "descripcion": data.get("descripcion","").strip(),
-        "categoria":   data.get("categoria","").strip(),
-        "tallas":      data.get("tallas", {}),
+        "producto_id":  data["producto_id"],
+        "modelo":       data.get("modelo","").strip(),
+        "descripcion":  data.get("descripcion","").strip(),
+        "talla_min":    int(data.get("talla_min", 18)),
+        "talla_max":    int(data.get("talla_max", 42)),
+        "tallas":       data.get("tallas", {}),
     }
-    r = sb.table("inventario").insert(item).execute()
+    r = sb.table("subproductos").insert(item).execute()
     return jsonify(r.data[0] if r.data else item), 201
 
-@app.route("/api/inventario/<int:iid>", methods=["PUT"])
-def api_editar_item(iid):
+@app.route("/api/subproductos/<int:sid>", methods=["PUT"])
+def api_editar_subproducto(sid):
     user = get_user()
-    if not user: return jsonify({"error": "No autenticado"}), 401
+    if not user or not is_admin(user): return jsonify({"error": "Sin permisos"}), 403
     data = request.get_json()
     update = {
-        "codigo":      data.get("codigo","").strip(),
+        "modelo":      data.get("modelo","").strip(),
         "descripcion": data.get("descripcion","").strip(),
-        "categoria":   data.get("categoria","").strip(),
+        "talla_min":   int(data.get("talla_min", 18)),
+        "talla_max":   int(data.get("talla_max", 42)),
         "tallas":      data.get("tallas", {}),
     }
-    r = sb.table("inventario").update(update).eq("id", iid).execute()
+    r = sb.table("subproductos").update(update).eq("id", sid).execute()
     return jsonify(r.data[0] if r.data else update)
 
-@app.route("/api/inventario/<int:iid>", methods=["DELETE"])
-def api_eliminar_item(iid):
+@app.route("/api/subproductos/<int:sid>", methods=["DELETE"])
+def api_eliminar_subproducto(sid):
     user = get_user()
-    if not user: return jsonify({"error": "No autenticado"}), 401
-    sb.table("inventario").delete().eq("id", iid).execute()
+    if not user or not is_admin(user): return jsonify({"error": "Sin permisos"}), 403
+    sb.table("subproductos").delete().eq("id", sid).execute()
     return jsonify({"ok": True})
 
 # ── API Ventas ────────────────────────────────────────────────────────────────
@@ -174,10 +181,33 @@ def api_registrar_venta():
     pid      = data["producto_id"]
     cant     = int(data["cantidad"])
     fecha    = data.get("fecha") or datetime.now().strftime("%Y-%m-%d")
+    talla    = data.get("talla")
+    subprod_id = data.get("subproducto_id")
+    modelo   = data.get("modelo","")
+
+    # Validar fecha para empleados
+    hoy = datetime.now().strftime("%Y-%m-%d")
+    if not is_admin(user) and fecha != hoy:
+        return jsonify({"error": "Solo el admin puede registrar ventas en otras fechas"}), 403
+
     pr = sb.table("productos").select("*").eq("id", pid).execute()
     if not pr.data:
         return jsonify({"error": "Producto no encontrado"}), 404
     producto = pr.data[0]
+
+    # Descontar inventario si tiene subproducto y talla
+    if subprod_id and talla:
+        sr = sb.table("subproductos").select("*").eq("id", subprod_id).execute()
+        if sr.data:
+            sub = sr.data[0]
+            tallas = sub.get("tallas", {})
+            talla_key = str(talla)
+            stock_actual = tallas.get(talla_key, 0)
+            if stock_actual < cant:
+                return jsonify({"error": f"Stock insuficiente para talla {talla}. Disponible: {stock_actual}"}), 400
+            tallas[talla_key] = stock_actual - cant
+            sb.table("subproductos").update({"tallas": tallas}).eq("id", subprod_id).execute()
+
     venta = {
         "producto_id":     pid,
         "nombre":          producto["nombre"],
@@ -193,6 +223,9 @@ def api_registrar_venta():
         "hora":            datetime.now().strftime("%H:%M"),
         "user_id":         session.get("user_id"),
         "user_email":      user.email,
+        "talla":           talla,
+        "subproducto_id":  subprod_id,
+        "modelo":          modelo,
     }
     r = sb.table("ventas").insert(venta).execute()
     return jsonify(r.data[0] if r.data else venta), 201
@@ -203,6 +236,47 @@ def api_eliminar_venta(vid):
     if not user: return jsonify({"error": "No autenticado"}), 401
     sb.table("ventas").delete().eq("id", vid).execute()
     return jsonify({"ok": True})
+
+# ── API Reportes ──────────────────────────────────────────────────────────────
+
+@app.route("/api/reportes", methods=["GET"])
+def api_reportes():
+    user = get_user()
+    if not user: return jsonify({"error": "No autenticado"}), 401
+    mes  = request.args.get("mes", datetime.now().strftime("%Y-%m"))
+    
+    if is_admin(user):
+        r = sb.table("ventas").select("*").like("fecha", f"{mes}%").execute()
+    else:
+        r = sb.table("ventas").select("*").eq("user_email", user.email).like("fecha", f"{mes}%").execute()
+    
+    ventas = r.data
+    total  = sum(v["total"] for v in ventas)
+    ganancia = sum(v.get("ganancia_total", 0) for v in ventas)
+    
+    # Top productos
+    conteo = {}
+    for v in ventas:
+        n = v["nombre"]
+        conteo[n] = conteo.get(n, {"cantidad": 0, "total": 0})
+        conteo[n]["cantidad"] += v["cantidad"]
+        conteo[n]["total"]    += v["total"]
+    top = sorted(conteo.items(), key=lambda x: x[1]["cantidad"], reverse=True)[:10]
+
+    # Ventas por día
+    por_dia = {}
+    for v in ventas:
+        d = v["fecha"]
+        por_dia[d] = por_dia.get(d, 0) + v["total"]
+    por_dia_list = [{"fecha": k, "total": v} for k, v in sorted(por_dia.items())]
+
+    return jsonify({
+        "total": total,
+        "ganancia": ganancia,
+        "cantidad_ventas": len(ventas),
+        "top_productos": [{"nombre": k, **v} for k, v in top],
+        "por_dia": por_dia_list,
+    })
 
 # ── Exportar Excel ────────────────────────────────────────────────────────────
 
@@ -246,19 +320,24 @@ def exportar_excel():
 
     ws = wb.active
     ws.title = "VENTAS"
-    set_header(ws, ["Fecha","Categoría","Código","Producto","Marca","Precio","Cantidad","Total","Ganancia","Vendedor"],
-                   [14,18,12,18,20,14,10,14,14,20])
+    set_header(ws, ["Fecha","Producto","Modelo","Talla","Marca","Precio","Cant.","Total","Ganancia","Vendedor"],
+                   [14,20,12,8,18,14,8,14,14,22])
     total_v = gan_v = 0
     for i, v in enumerate(ventas):
         r = i + 3
         fill = alt if i % 2 == 0 else PatternFill("solid", start_color="FFFFFF")
-        for col, val in enumerate([v["fecha"],v.get("categoria",""),v.get("codigo",""),v["nombre"],
+        for col, val in enumerate([v["fecha"],v["nombre"],v.get("modelo",""),v.get("talla",""),
                 v.get("marca",""),v["precio_unitario"],v["cantidad"],v["total"],
                 v.get("ganancia_total",0),v.get("user_email","")], 1):
             c = ws.cell(row=r, column=col, value=val)
             c.font = nfnt; c.fill = fill; c.border = brd; c.alignment = ctr
         total_v += v["total"]; gan_v += v.get("ganancia_total",0)
         ws.row_dimensions[r].height = 16
+    tr = len(ventas) + 3
+    for col, val in enumerate(["","TOTAL","","","","","",total_v,gan_v,""], 1):
+        c = ws.cell(row=tr, column=col, value=val)
+        c.font = Font(bold=True, name="Arial", size=10)
+        c.fill = PatternFill("solid", start_color="EAF3DE"); c.border = brd; c.alignment = ctr
 
     buf = io.BytesIO()
     wb.save(buf); buf.seek(0)
@@ -288,23 +367,23 @@ def exportar_pdf():
     doc = SimpleDocTemplate(buf, pagesize=landscape(A4),
                             topMargin=1.5*cm, bottomMargin=1.5*cm,
                             leftMargin=1.5*cm, rightMargin=1.5*cm)
-    styles  = getSampleStyleSheet()
+    styles = getSampleStyleSheet()
     t_style = ParagraphStyle("t", parent=styles["Heading1"], fontSize=14, spaceAfter=4)
     s_style = ParagraphStyle("s", parent=styles["Normal"], fontSize=8, spaceAfter=12)
-    elems   = [Paragraph("Reporte de Ventas — KiddoShoes", t_style),
-               Paragraph(f"Generado el {datetime.now().strftime('%d/%m/%Y %H:%M')}", s_style)]
+    elems = [Paragraph("Reporte de Ventas — KiddoShoes", t_style),
+             Paragraph(f"Generado el {datetime.now().strftime('%d/%m/%Y %H:%M')}", s_style)]
 
-    hdr  = ["Fecha","Categoría","Código","Producto","Marca","Precio","Cant.","Total","Ganancia"]
+    hdr  = ["Fecha","Producto","Modelo","Talla","Marca","Precio","Cant.","Total","Ganancia"]
     rows = [hdr]
     total_v = gan_v = 0
     for v in ventas:
-        rows.append([v["fecha"],v.get("categoria",""),v.get("codigo",""),v["nombre"],
+        rows.append([v["fecha"],v["nombre"],v.get("modelo",""),str(v.get("talla","")),
                      v.get("marca",""),f"${v['precio_unitario']:,.0f}",str(v["cantidad"]),
                      f"${v['total']:,.0f}",f"${v.get('ganancia_total',0):,.0f}"])
         total_v += v["total"]; gan_v += v.get("ganancia_total",0)
-    rows.append(["","","","","","TOTAL","",f"${total_v:,.0f}",f"${gan_v:,.0f}"])
+    rows.append(["","TOTAL","","","","","",f"${total_v:,.0f}",f"${gan_v:,.0f}"])
 
-    cw = [2.2*cm,3.2*cm,2*cm,3.5*cm,3.8*cm,2.5*cm,1.5*cm,2.5*cm,2.5*cm]
+    cw = [2.2*cm,3.8*cm,2*cm,1.5*cm,3*cm,2.5*cm,1.5*cm,2.5*cm,2.5*cm]
     t  = Table(rows, colWidths=cw, repeatRows=1)
     t.setStyle(TableStyle([
         ("BACKGROUND",(0,0),(-1,0),colors.HexColor("#1a1a18")),
