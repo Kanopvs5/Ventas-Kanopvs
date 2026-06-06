@@ -177,25 +177,23 @@ def api_get_ventas():
 def api_registrar_venta():
     user = get_user()
     if not user: return jsonify({"error": "No autenticado"}), 401
-    data     = request.get_json()
-    pid      = data["producto_id"]
-    cant     = int(data["cantidad"])
-    fecha    = data.get("fecha") or datetime.now().strftime("%Y-%m-%d")
-    talla    = data.get("talla")
+    data       = request.get_json()
+    pid        = data["producto_id"]
+    cant       = int(data["cantidad"])
+    fecha      = data.get("fecha") or datetime.now().strftime("%Y-%m-%d")
+    talla      = data.get("talla")
     subprod_id = data.get("subproducto_id")
-    modelo   = data.get("modelo","")
+    modelo     = data.get("modelo","")
 
-    # Validar fecha para empleados
     hoy = datetime.now().strftime("%Y-%m-%d")
     if not is_admin(user) and fecha != hoy:
-        return jsonify({"error": "Solo el admin puede registrar ventas en otras fechas"}), 403
+        return jsonify({"error": "Solo el admin puede registrar en otras fechas"}), 403
 
     pr = sb.table("productos").select("*").eq("id", pid).execute()
     if not pr.data:
         return jsonify({"error": "Producto no encontrado"}), 404
     producto = pr.data[0]
 
-    # Descontar inventario si tiene subproducto y talla
     if subprod_id and talla:
         sr = sb.table("subproductos").select("*").eq("id", subprod_id).execute()
         if sr.data:
@@ -243,27 +241,25 @@ def api_eliminar_venta(vid):
 def api_reportes():
     user = get_user()
     if not user: return jsonify({"error": "No autenticado"}), 401
-    mes  = request.args.get("mes", datetime.now().strftime("%Y-%m"))
-    
+    mes = request.args.get("mes", datetime.now().strftime("%Y-%m"))
+
     if is_admin(user):
         r = sb.table("ventas").select("*").like("fecha", f"{mes}%").execute()
     else:
         r = sb.table("ventas").select("*").eq("user_email", user.email).like("fecha", f"{mes}%").execute()
-    
-    ventas = r.data
-    total  = sum(v["total"] for v in ventas)
+
+    ventas   = r.data
+    total    = sum(v["total"] for v in ventas)
     ganancia = sum(v.get("ganancia_total", 0) for v in ventas)
-    
-    # Top productos
+
     conteo = {}
     for v in ventas:
         n = v["nombre"]
-        conteo[n] = conteo.get(n, {"cantidad": 0, "total": 0})
+        if n not in conteo: conteo[n] = {"cantidad": 0, "total": 0}
         conteo[n]["cantidad"] += v["cantidad"]
         conteo[n]["total"]    += v["total"]
     top = sorted(conteo.items(), key=lambda x: x[1]["cantidad"], reverse=True)[:10]
 
-    # Ventas por día
     por_dia = {}
     for v in ventas:
         d = v["fecha"]
@@ -295,55 +291,43 @@ def exportar_excel():
     else:
         ventas = sb.table("ventas").select("*").eq("user_email", user.email).order("id", desc=False).execute().data
 
-    productos = sb.table("productos").select("*").execute().data
-    wb = Workbook()
-
-    hf   = PatternFill("solid", start_color="1a1a18")
-    hfnt = Font(bold=True, color="FFFFFF", name="Arial", size=10)
-    nfnt = Font(name="Arial", size=10)
-    alt  = PatternFill("solid", start_color="F5F4F0")
-    bs   = Side(style="thin", color="E2E0D8")
-    brd  = Border(left=bs, right=bs, top=bs, bottom=bs)
-    ctr  = Alignment(horizontal="center", vertical="center")
-
-    def set_header(ws, headers, widths):
-        ws.merge_cells(f"A1:{chr(64+len(headers))}1")
-        ws["A1"] = f"Exportado el {datetime.now().strftime('%d/%m/%Y %H:%M')}"
-        ws["A1"].font = Font(bold=True, name="Arial", size=12)
-        ws["A1"].alignment = ctr
-        ws.row_dimensions[1].height = 28
-        for col, (h, w) in enumerate(zip(headers, widths), 1):
-            c = ws.cell(row=2, column=col, value=h)
-            c.font = hfnt; c.fill = hf; c.alignment = ctr; c.border = brd
-            ws.column_dimensions[c.column_letter].width = w
-        ws.row_dimensions[2].height = 20
+    wb  = Workbook()
+    hf  = PatternFill("solid", start_color="1a1a18")
+    hfnt= Font(bold=True, color="FFFFFF", name="Arial", size=10)
+    nfnt= Font(name="Arial", size=10)
+    alt = PatternFill("solid", start_color="F5F4F0")
+    bs  = Side(style="thin", color="E2E0D8")
+    brd = Border(left=bs, right=bs, top=bs, bottom=bs)
+    ctr = Alignment(horizontal="center", vertical="center")
 
     ws = wb.active
     ws.title = "VENTAS"
-    set_header(ws, ["Fecha","Producto","Modelo","Talla","Marca","Precio","Cant.","Total","Ganancia","Vendedor"],
-                   [14,20,12,8,18,14,8,14,14,22])
-    total_v = gan_v = 0
-    for i, v in enumerate(ventas):
-        r = i + 3
-        fill = alt if i % 2 == 0 else PatternFill("solid", start_color="FFFFFF")
-        for col, val in enumerate([v["fecha"],v["nombre"],v.get("modelo",""),v.get("talla",""),
+    headers = ["Fecha","Producto","Modelo","Talla","Marca","Precio","Cant.","Total","Ganancia","Vendedor"]
+    widths  = [14,20,12,8,18,14,8,14,14,22]
+    ws.merge_cells(f"A1:J1")
+    ws["A1"] = f"Exportado el {datetime.now().strftime('%d/%m/%Y %H:%M')}"
+    ws["A1"].font = Font(bold=True, name="Arial", size=12); ws["A1"].alignment = ctr
+    ws.row_dimensions[1].height = 28
+    for col,(h,w) in enumerate(zip(headers,widths),1):
+        c=ws.cell(row=2,column=col,value=h); c.font=hfnt; c.fill=hf; c.alignment=ctr; c.border=brd
+        ws.column_dimensions[c.column_letter].width=w
+    ws.row_dimensions[2].height=20
+    total_v=gan_v=0
+    for i,v in enumerate(ventas):
+        r=i+3; fill=alt if i%2==0 else PatternFill("solid",start_color="FFFFFF")
+        for col,val in enumerate([v["fecha"],v["nombre"],v.get("modelo",""),v.get("talla",""),
                 v.get("marca",""),v["precio_unitario"],v["cantidad"],v["total"],
-                v.get("ganancia_total",0),v.get("user_email","")], 1):
-            c = ws.cell(row=r, column=col, value=val)
-            c.font = nfnt; c.fill = fill; c.border = brd; c.alignment = ctr
-        total_v += v["total"]; gan_v += v.get("ganancia_total",0)
-        ws.row_dimensions[r].height = 16
-    tr = len(ventas) + 3
-    for col, val in enumerate(["","TOTAL","","","","","",total_v,gan_v,""], 1):
-        c = ws.cell(row=tr, column=col, value=val)
-        c.font = Font(bold=True, name="Arial", size=10)
-        c.fill = PatternFill("solid", start_color="EAF3DE"); c.border = brd; c.alignment = ctr
+                v.get("ganancia_total",0),v.get("user_email","")],1):
+            c=ws.cell(row=r,column=col,value=val); c.font=nfnt; c.fill=fill; c.border=brd; c.alignment=ctr
+        total_v+=v["total"]; gan_v+=v.get("ganancia_total",0); ws.row_dimensions[r].height=16
+    tr=len(ventas)+3
+    for col,val in enumerate(["","TOTAL","","","","","",total_v,gan_v,""],1):
+        c=ws.cell(row=tr,column=col,value=val); c.font=Font(bold=True,name="Arial",size=10)
+        c.fill=PatternFill("solid",start_color="EAF3DE"); c.border=brd; c.alignment=ctr
 
-    buf = io.BytesIO()
-    wb.save(buf); buf.seek(0)
-    fname = f"ventas_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
-    return send_file(buf, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                     as_attachment=True, download_name=fname)
+    buf=io.BytesIO(); wb.save(buf); buf.seek(0)
+    return send_file(buf,mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                     as_attachment=True,download_name=f"ventas_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx")
 
 @app.route("/api/exportar/pdf")
 def exportar_pdf():
@@ -359,50 +343,31 @@ def exportar_pdf():
         return jsonify({"error":"pip install reportlab"}), 500
 
     if is_admin(user):
-        ventas = sb.table("ventas").select("*").order("id", desc=False).execute().data
+        ventas = sb.table("ventas").select("*").order("id",desc=False).execute().data
     else:
-        ventas = sb.table("ventas").select("*").eq("user_email", user.email).order("id", desc=False).execute().data
+        ventas = sb.table("ventas").select("*").eq("user_email",user.email).order("id",desc=False).execute().data
 
-    buf = io.BytesIO()
-    doc = SimpleDocTemplate(buf, pagesize=landscape(A4),
-                            topMargin=1.5*cm, bottomMargin=1.5*cm,
-                            leftMargin=1.5*cm, rightMargin=1.5*cm)
-    styles = getSampleStyleSheet()
-    t_style = ParagraphStyle("t", parent=styles["Heading1"], fontSize=14, spaceAfter=4)
-    s_style = ParagraphStyle("s", parent=styles["Normal"], fontSize=8, spaceAfter=12)
-    elems = [Paragraph("Reporte de Ventas — KiddoShoes", t_style),
-             Paragraph(f"Generado el {datetime.now().strftime('%d/%m/%Y %H:%M')}", s_style)]
-
-    hdr  = ["Fecha","Producto","Modelo","Talla","Marca","Precio","Cant.","Total","Ganancia"]
-    rows = [hdr]
-    total_v = gan_v = 0
+    buf=io.BytesIO()
+    doc=SimpleDocTemplate(buf,pagesize=landscape(A4),topMargin=1.5*cm,bottomMargin=1.5*cm,leftMargin=1.5*cm,rightMargin=1.5*cm)
+    styles=getSampleStyleSheet()
+    elems=[Paragraph("Reporte de Ventas — KiddoShoes",ParagraphStyle("t",parent=styles["Heading1"],fontSize=14,spaceAfter=4)),
+           Paragraph(f"Generado el {datetime.now().strftime('%d/%m/%Y %H:%M')}",ParagraphStyle("s",parent=styles["Normal"],fontSize=8,spaceAfter=12))]
+    hdr=["Fecha","Producto","Modelo","Talla","Marca","Precio","Cant.","Total","Ganancia"]
+    rows=[hdr]; total_v=gan_v=0
     for v in ventas:
-        rows.append([v["fecha"],v["nombre"],v.get("modelo",""),str(v.get("talla","")),
-                     v.get("marca",""),f"${v['precio_unitario']:,.0f}",str(v["cantidad"]),
-                     f"${v['total']:,.0f}",f"${v.get('ganancia_total',0):,.0f}"])
-        total_v += v["total"]; gan_v += v.get("ganancia_total",0)
+        rows.append([v["fecha"],v["nombre"],v.get("modelo",""),str(v.get("talla","")),v.get("marca",""),
+                     f"${v['precio_unitario']:,.0f}",str(v["cantidad"]),f"${v['total']:,.0f}",f"${v.get('ganancia_total',0):,.0f}"])
+        total_v+=v["total"]; gan_v+=v.get("ganancia_total",0)
     rows.append(["","TOTAL","","","","","",f"${total_v:,.0f}",f"${gan_v:,.0f}"])
-
-    cw = [2.2*cm,3.8*cm,2*cm,1.5*cm,3*cm,2.5*cm,1.5*cm,2.5*cm,2.5*cm]
-    t  = Table(rows, colWidths=cw, repeatRows=1)
-    t.setStyle(TableStyle([
-        ("BACKGROUND",(0,0),(-1,0),colors.HexColor("#1a1a18")),
-        ("TEXTCOLOR",(0,0),(-1,0),colors.white),
-        ("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
-        ("FONTSIZE",(0,0),(-1,-1),7),
-        ("ALIGN",(0,0),(-1,-1),"CENTER"),
-        ("VALIGN",(0,0),(-1,-1),"MIDDLE"),
-        ("ROWBACKGROUNDS",(0,1),(-1,-2),[colors.HexColor("#F5F4F0"),colors.white]),
-        ("FONTNAME",(0,1),(-1,-1),"Helvetica"),
-        ("GRID",(0,0),(-1,-1),0.4,colors.HexColor("#E2E0D8")),
-        ("ROWHEIGHT",(0,0),(-1,-1),0.55*cm),
-        ("BACKGROUND",(0,-1),(-1,-1),colors.HexColor("#EAF3DE")),
-    ]))
-    elems.append(t)
-    doc.build(elems)
-    buf.seek(0)
-    fname = f"reporte_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
-    return send_file(buf, mimetype="application/pdf", as_attachment=True, download_name=fname)
+    cw=[2.2*cm,3.8*cm,2*cm,1.5*cm,3*cm,2.5*cm,1.5*cm,2.5*cm,2.5*cm]
+    t=Table(rows,colWidths=cw,repeatRows=1)
+    t.setStyle(TableStyle([("BACKGROUND",(0,0),(-1,0),colors.HexColor("#1a1a18")),("TEXTCOLOR",(0,0),(-1,0),colors.white),
+        ("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),("FONTSIZE",(0,0),(-1,-1),7),("ALIGN",(0,0),(-1,-1),"CENTER"),
+        ("VALIGN",(0,0),(-1,-1),"MIDDLE"),("ROWBACKGROUNDS",(0,1),(-1,-2),[colors.HexColor("#F5F4F0"),colors.white]),
+        ("FONTNAME",(0,1),(-1,-1),"Helvetica"),("GRID",(0,0),(-1,-1),0.4,colors.HexColor("#E2E0D8")),
+        ("ROWHEIGHT",(0,0),(-1,-1),0.55*cm),("BACKGROUND",(0,-1),(-1,-1),colors.HexColor("#EAF3DE"))]))
+    elems.append(t); doc.build(elems); buf.seek(0)
+    return send_file(buf,mimetype="application/pdf",as_attachment=True,download_name=f"reporte_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf")
 
 if __name__ == "__main__":
     print("🚀 Servidor iniciado en http://127.0.0.1:5000")
