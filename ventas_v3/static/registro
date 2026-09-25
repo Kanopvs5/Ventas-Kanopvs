@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registrar mi saco — Torre KANOPVS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --blueprint:#0f1b2e;
+    --blueprint-line: rgba(120,160,220,0.16);
+    --paper:#f2eee3;
+    --ink:#1a1a16;
+    --safety:#ff6b2c;
+    --concrete-line:#c9c2b3;
+    --err:#a3402a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      repeating-linear-gradient(0deg, var(--blueprint-line) 0, var(--blueprint-line) 1px, transparent 1px, transparent 32px),
+      repeating-linear-gradient(90deg, var(--blueprint-line) 0, var(--blueprint-line) 1px, transparent 1px, transparent 32px),
+      var(--blueprint);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:2rem 1rem;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .card{
+    background:var(--paper);
+    width:100%;
+    max-width:420px;
+    padding:2rem 1.6rem 1.8rem;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.35);
+    position:relative;
+  }
+  .eyebrow{ font-size:0.68rem; color:#9a9384; letter-spacing:0.03em; }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:1.7rem;
+    margin:0.3rem 0 0.4rem;
+    color:var(--ink);
+  }
+  .sub{ font-size:0.8rem; color:#5a5648; line-height:1.5; margin-bottom:1.6rem; }
+
+  label{
+    display:block;
+    font-size:0.68rem;
+    color:#5a5648;
+    margin-bottom:0.35rem;
+    margin-top:1.1rem;
+  }
+  input[type=text]{
+    width:100%;
+    border:1px solid var(--concrete-line);
+    background:#fff;
+    padding:0.7rem 0.75rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.9rem;
+    color:var(--ink);
+  }
+  input[type=text]:focus{ outline:2px solid var(--safety); outline-offset:1px; }
+  input#codigo{ text-transform:uppercase; letter-spacing:0.05em; }
+
+  /* preview del bloque de color que le va a tocar */
+  .preview{
+    margin-top:1.4rem;
+    display:flex;
+    align-items:center;
+    gap:0.7rem;
+  }
+  .preview .swatch{
+    width:46px;
+    height:46px;
+    border:1px solid rgba(0,0,0,0.15);
+    flex-shrink:0;
+  }
+  .preview .txt{ font-size:0.68rem; color:#8d8579; line-height:1.4; }
+
+  button{
+    width:100%;
+    margin-top:1.6rem;
+    background:var(--safety);
+    color:var(--ink);
+    border:none;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:0.85rem;
+    padding:0.85rem;
+    cursor:pointer;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+  }
+  button:disabled{ opacity:0.55; cursor:not-allowed; }
+
+  .msg{ font-size:0.76rem; margin-top:0.9rem; line-height:1.5; }
+  .msg.err{ color:var(--err); }
+
+  .done{ display:none; text-align:center; }
+  .done.show{ display:block; }
+  .done .swatch-big{
+    width:64%;
+    aspect-ratio:1;
+    margin:1rem auto 1rem;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.15);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    color:#fff;
+    font-size:1.1rem;
+    text-align:center;
+    padding:0.5rem;
+  }
+  .done a{ color:var(--safety); font-weight:600; text-decoration:none; }
+
+  form.hide{ display:none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="eyebrow">FICHA DE REGISTRO — TORRE KANOPVS</div>
+  <h1 class="display">Coloca tu bloque</h1>
+  <p class="sub">Raspa el código de la etiqueta de tu saco, escríbelo aquí junto con tu nombre y quedará colocado como un bloque más en la torre pública.</p>
+
+  <form id="form">
+    <label for="codigo">Código raspado de la etiqueta</label>
+    <input type="text" id="codigo" placeholder="EJ. KNPV-0512" required>
+
+    <label for="nombre">Tu nombre</label>
+    <input type="text" id="nombre" placeholder="¿Cómo quieres aparecer en la torre?" required>
+
+    <div class="preview">
+      <div class="swatch" id="swatch" style="background:#c9c2b3;"></div>
+      <div class="txt">Este será el color de tu bloque en la torre. Cada código tiene un color distinto.</div>
+    </div>
+
+    <button type="submit" id="submitBtn">COLOCAR MI BLOQUE</button>
+    <div class="msg" id="msg"></div>
+  </form>
+
+  <div class="done" id="done">
+    <div class="eyebrow">BLOQUE COLOCADO</div>
+    <h1 class="display">Ya eres parte de la torre</h1>
+    <div class="swatch-big" id="doneSwatch"></div>
+    <p class="sub"><a href="torre.html">Ver la torre completa →</a></p>
+  </div>
+</div>
+
+<script>
+  // --- CONFIGURA AQUÍ TU PROYECTO SUPABASE (igual que en torre.html) ---
+  const SUPABASE_URL = "https://bbzmwneywbbgamnttply.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_kDvKdK8S-AZxiGRnBRqpHw_Tjky7Uhe";
+  // ----------------------------------------------------------------------
+
+  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // paleta de "materiales" de construcción — el color de cada bloque
+  // sale del código, así que es determinístico y consistente en toda la torre.
+  const PALETA = ['#ff6b2c', '#2b4570', '#8d8579', '#c9502f', '#3f6b52', '#d9a441'];
+
+  function colorDeCodigo(codigo){
+    let hash = 0;
+    for(let i=0; i<codigo.length; i++){
+      hash = (hash * 31 + codigo.charCodeAt(i)) >>> 0;
+    }
+    return PALETA[hash % PALETA.length];
+  }
+
+  const form = document.getElementById('form');
+  const codigoInput = document.getElementById('codigo');
+  const swatch = document.getElementById('swatch');
+  const msg = document.getElementById('msg');
+  const submitBtn = document.getElementById('submitBtn');
+  const done = document.getElementById('done');
+
+  codigoInput.addEventListener('input', () => {
+    const c = codigoInput.value.trim().toUpperCase();
+    swatch.style.background = c ? colorDeCodigo(c) : '#c9c2b3';
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.textContent = '';
+    msg.className = 'msg';
+
+    const codigo = codigoInput.value.trim().toUpperCase();
+    const nombre = document.getElementById('nombre').value.trim();
+
+    if(!codigo || !nombre){
+      msg.textContent = 'Completa el código y tu nombre.';
+      msg.className = 'msg err';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'COLOCANDO...';
+
+    try{
+      const { error: insertError } = await client
+        .from('registros_torre')
+        .insert({ codigo, nombre_comprador: nombre });
+
+      if(insertError){
+        if(insertError.code === '23505'){
+          throw new Error('DUPLICADO');
+        }
+        throw insertError;
+      }
+
+      document.getElementById('doneSwatch').style.background = colorDeCodigo(codigo);
+      document.getElementById('doneSwatch').textContent = nombre;
+      form.classList.add('hide');
+      done.classList.add('show');
+
+    }catch(err){
+      console.error(err);
+      if(err.message === 'DUPLICADO'){
+        msg.textContent = 'Este código ya fue registrado antes. Si crees que es un error, escríbenos.';
+      } else {
+        msg.textContent = 'No pudimos registrar tu bloque. Intenta de nuevo.';
+      }
+      msg.className = 'msg err';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'COLOCAR MI BLOQUE';
+    }
+  });
+</script>
+</body>
+</html>
