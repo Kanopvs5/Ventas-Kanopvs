@@ -204,16 +204,10 @@
     submitBtn.textContent = 'COLOCANDO...';
 
     try{
-      const { error: insertError } = await client
-        .from('registros_torre')
-        .insert({ codigo, nombre_comprador: nombre });
+      const { error: rpcError } = await client
+        .rpc('registrar_bloque', { p_codigo: codigo, p_nombre: nombre });
 
-      if(insertError){
-        if(insertError.code === '23505'){
-          throw new Error('DUPLICADO');
-        }
-        throw insertError;
-      }
+      if(rpcError) throw rpcError;
 
       document.getElementById('doneSwatch').style.background = colorDeCodigo(codigo);
       document.getElementById('doneSwatch').textContent = nombre;
@@ -222,8 +216,13 @@
 
     }catch(err){
       console.error(err);
-      if(err.message === 'DUPLICADO'){
+      const detalle = (err && err.message) || '';
+      if(detalle.includes('CODIGO_INVALIDO')){
+        msg.textContent = 'Ese código no existe. Revisa que lo hayas escrito tal como aparece en la etiqueta.';
+      } else if(detalle.includes('YA_REGISTRADO')){
         msg.textContent = 'Este código ya fue registrado antes. Si crees que es un error, escríbenos.';
+      } else if(detalle.includes('DATOS_INCOMPLETOS')){
+        msg.textContent = 'Completa el código y tu nombre.';
       } else {
         msg.textContent = 'No pudimos registrar tu bloque. Intenta de nuevo.';
       }
